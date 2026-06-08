@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 from sklearn.model_selection import train_test_split
 
@@ -144,6 +146,49 @@ historico = modelo.fit(
     batch_size=64
 )
 
+
+plt.figure(figsize=(10,5))
+
+plt.plot(
+    historico.history['loss'],
+    label='Treino'
+)
+
+plt.plot(
+    historico.history['val_loss'],
+    label='Validação'
+)
+
+plt.title('Loss Treino x Validação')
+plt.xlabel('Épocas')
+plt.ylabel('Loss')
+plt.legend()
+
+plt.savefig('resultados/loss.png')
+
+plt.show()
+
+plt.figure(figsize=(10,5))
+
+plt.plot(
+    historico.history['mae'],
+    label='MAE Treino'
+)
+
+plt.plot(
+    historico.history['val_mae'],
+    label='MAE Validação'
+)
+
+plt.title('MAE por Época')
+plt.xlabel('Épocas')
+plt.ylabel('MAE')
+plt.legend()
+
+plt.savefig('resultados/mae.png')
+
+plt.show()
+
 # ==========================
 # Avaliação
 # ==========================
@@ -153,7 +198,12 @@ loss, mae = modelo.evaluate(
     y_teste
 )
 
-print("\nMAE Final:", mae)
+rmse = np.sqrt(loss)
+
+print("\n===== MÉTRICAS FINAIS =====")
+print("MAE :", mae)
+print("RMSE:", rmse)
+print("LOSS:", loss)
 
 # ==========================
 # Salvar Modelo
@@ -162,3 +212,51 @@ print("\nMAE Final:", mae)
 modelo.save("modelos/recomendador.h5")
 
 print("\nModelo salvo com sucesso!")
+with open(
+    "resultados/metricas.txt",
+    "w",
+    encoding="utf-8"
+) as arquivo:
+
+    arquivo.write(
+        f"MAE: {mae}\n"
+    )
+
+    arquivo.write(
+        f"RMSE: {rmse}\n"
+    )
+
+    arquivo.write(
+        f"LOSS: {loss}\n"
+    )
+    
+plt.figure(figsize=(6,4))
+
+modelos = [
+    "Baseline",
+    "Deep Learning"
+]
+
+maes = [
+    1.00,
+    mae
+]
+
+plt.bar(
+    modelos,
+    maes
+)
+
+plt.title(
+    "Comparação de MAE"
+)
+
+plt.ylabel(
+    "MAE"
+)
+
+plt.savefig(
+    "resultados/comparacao_mae.png"
+)
+
+plt.show()
