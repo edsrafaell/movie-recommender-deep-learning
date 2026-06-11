@@ -32,19 +32,61 @@ filmes = pd.read_csv(
 filmes["filme_id"] = filmes["filme_id"] - 1
 
 # ==========================
+# Carregar avaliações
+# ==========================
+
+dados = pd.read_csv(
+    "dados/u.data",
+    sep="\t",
+    names=["usuario", "filme", "nota", "timestamp"]
+)
+
+# ==========================
 # ENDPOINT
 # ==========================
 
 @app.route("/recomendar/<int:usuario>")
 def recomendar(usuario):
 
-    usuario = usuario - 1
+    usuario_id = usuario - 1
+
+    # ==========================
+    # Filmes favoritos do usuário
+    # ==========================
+
+    historico_usuario = dados[
+        dados["usuario"] == usuario
+    ]
+
+    top_gostou = historico_usuario.sort_values(
+        by="nota",
+        ascending=False
+    ).head(5)
+
+    top_gostou = top_gostou.merge(
+        filmes,
+        left_on="filme",
+        right_on="filme_id"
+    )
+
+    favoritos = []
+
+    for _, filme in top_gostou.iterrows():
+
+        favoritos.append({
+            "titulo": filme["titulo"],
+            "nota": int(filme["nota"])
+        })
+
+    # ==========================
+    # Gerar recomendações
+    # ==========================
 
     todos_filmes = filmes["filme_id"].values
 
     usuarios = np.full(
         len(todos_filmes),
-        usuario
+        usuario_id
     )
 
     previsoes = modelo.predict(
@@ -64,15 +106,24 @@ def recomendar(usuario):
     for _, filme in top.iterrows():
 
         resultado.append({
-            "filme": filme["titulo"],
+            "titulo": filme["titulo"],
             "nota_prevista": round(
                 float(filme["nota_prevista"]),
                 2
             )
         })
 
+    # ==========================
+    # Resposta JSON
+    # ==========================
+
     return jsonify({
-        "usuario": usuario + 1,
+        "usuario": usuario,
+        "criterio": (
+            "As recomendações foram geradas com base "
+            "nas avaliações anteriores do usuário."
+        ),
+        "filmes_favoritos": favoritos,
         "recomendacoes": resultado
     })
 
