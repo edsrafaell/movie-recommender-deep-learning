@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cinescope — recomendações sob medida</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+  :root{
+    --backstage:#15111a;
+    --backstage-2:#1f1825;
+    --curtain:#6e1e33;
+    --curtain-2:#8a2940;
+    --marquee:#e8ac44;
+    --marquee-dim:#a8823f;
+    --paper:#f4ecdc;
+    --ink:#241b21;
+    --teal:#2e7d77;
+    --muted:#9c8790;
+    --radius:6px;
+    --border:#3a2e3f;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--backstage);
+    color:var(--paper);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,.brand,.eyebrow{
+    font-family:'Bebas Neue',sans-serif;
+    letter-spacing:0.04em;
+  }
+  .mono{font-family:'JetBrains Mono',monospace;}
+  a{color:inherit;}
+
+  :focus-visible{
+    outline:3px solid var(--marquee);
+    outline-offset:3px;
+  }
+
+  /* ===== Header / Marquee ===== */
+  .marquee{
+    background:
+      radial-gradient(circle at 15% 20%, rgba(232,172,68,0.08), transparent 40%),
+      radial-gradient(circle at 85% 0%, rgba(110,30,51,0.35), transparent 45%),
+      var(--backstage);
+    border-bottom:1px solid var(--border);
+    padding:2.5rem 1.5rem 3.5rem;
+  }
+  .brand-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:0.5rem;
+    align-items:center;
+    justify-content:space-between;
+    max-width:920px;
+    margin:0 auto 2.5rem;
+  }
+  .brand{
+    font-size:1.6rem;
+    color:var(--marquee);
+    display:flex;
+    align-items:center;
+    gap:0.5rem;
+  }
+  .brand::before{content:"★";font-size:1.1rem;}
+  .brand-tag{
+    font-size:0.8rem;
+    color:var(--muted);
+    font-family:'Inter',sans-serif;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+  }
+
+  .hero{
+    max-width:680px;
+    margin:0 auto;
+    text-align:center;
+  }
+  .hero h1{
+    font-size:clamp(2rem,5vw,3.2rem);
+    color:var(--paper);
+    margin:0 0 0.75rem;
+  }
+  .hero p.subtitle{
+    color:#cdb8a8;
+    margin:0 0 2rem;
+    font-size:1.05rem;
+  }
+
+  .ticket-form{
+    display:flex;
+    gap:0.75rem;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+  .field{display:flex;flex-direction:column;}
+  .ticket-form label{
+    display:block;
+    text-align:left;
+    font-size:0.75rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:var(--marquee-dim);
+    margin-bottom:0.4rem;
+  }
+  .ticket-form input{
+    font-family:'JetBrains Mono',monospace;
+    font-size:1.1rem;
+    padding:0.7rem 0.9rem;
+    border-radius:var(--radius);
+    border:1px solid var(--border);
+    background:var(--backstage-2);
+    color:var(--paper);
+    width:11rem;
+  }
+  .ticket-form input::placeholder{color:#6b5d63;}
+  .ticket-form button{
+    align-self:flex-end;
+    background:var(--marquee);
+    color:var(--ink);
+    border:none;
+    font-family:'Bebas Neue',sans-serif;
+    font-size:1.05rem;
+    letter-spacing:0.04em;
+    padding:0.75rem 1.4rem;
+    border-radius:var(--radius);
+    cursor:pointer;
+    transition:transform 0.15s ease, background 0.15s ease;
+  }
+  .ticket-form button:hover{background:#f0bd5e;}
+  .ticket-form button:active{transform:translateY(1px);}
+
+  .hint{margin-top:1.25rem;font-size:0.85rem;color:var(--muted);}
+
+  /* ===== Status ===== */
+  .status{
+    max-width:680px;
+    margin:0 auto;
+    padding:0 1.5rem;
+    min-height:1.5rem;
+    text-align:center;
+    font-size:0.95rem;
+  }
+  .status--loading{color:var(--marquee);}
+  .status--error{color:#e07a6a;}
+
+  /* ===== Main results ===== */
+  main{background:var(--backstage-2);padding:3rem 1.5rem 4rem;}
+  section + section{margin-top:3.5rem;}
+  .section-inner{max-width:1040px;margin:0 auto;}
+  .eyebrow{
+    display:block;
+    font-size:0.8rem;
+    color:var(--teal);
+    letter-spacing:0.1em;
+    margin-bottom:0.3rem;
+  }
+  h2{font-size:1.8rem;color:var(--paper);margin:0 0 1.5rem;}
+
+  /* ----- Ticket stub cards (histórico) ----- */
+  .stub-row{display:flex;gap:1.25rem;overflow-x:auto;padding-bottom:0.5rem;}
+  .stub{
+    position:relative;
+    flex:0 0 200px;
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:var(--radius);
+    padding:1.25rem 1.1rem;
+    border:1px dashed #cbb89e;
+  }
+  .stub::before,.stub::after{
+    content:"";
+    position:absolute;
+    width:18px;height:18px;
+    background:var(--backstage-2);
+    border-radius:50%;
+    top:50%;
+    transform:translateY(-50%);
+  }
+  .stub::before{left:-9px;}
+  .stub::after{right:-9px;}
+  .stub-eyebrow{
+    display:block;
+    font-size:0.65rem;
+    text-transform:uppercase;
+    letter-spacing:0.08em;
+    color:#6b5640;
+    margin-bottom:0.5rem;
+  }
+  .stub h3{
+    font-size:1rem;
+    margin:0 0 0.6rem;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    line-height:1.3;
+  }
+  .stars{color:var(--curtain);font-size:1rem;letter-spacing:0.05em;}
+
+  .recommendation-ticket{
+    background: #FFD700;
+    color: #241b21;
+  }
+  /* ----- Poster / recomendação cards ----- */
+  .poster-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+    gap:1.25rem;
+  }
+  .poster-card{
+    background:linear-gradient(160deg,var(--curtain),var(--curtain-2));
+    border-radius:var(--radius);
+    padding:1.4rem 1.2rem;
+    border:1px solid var(--border);
+  }
+  .poster-card h3{
+    font-size:1.05rem;
+    margin:0 0 1rem;
+    font-weight:600;
+    color:var(--paper);
+    line-height:1.3;
+    min-height:2.6em;
+  }
+  .gauge{display:flex;gap:3px;margin-bottom:0.6rem;}
+  .frame{
+    position:relative;
+    flex:1;
+    height:18px;
+    border-radius:2px;
+    background:rgba(244,236,220,0.12);
+    overflow:hidden;
+  }
+  .frame::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background-image:radial-gradient(circle, rgba(21,17,26,0.6) 1.5px, transparent 1.6px);
+    background-size:6px 6px;
+    background-position:0 1px;
+    z-index:2;
+  }
+  .frame::after{
+    content:"";
+    position:absolute;
+    left:0;top:0;bottom:0;
+    width:calc(var(--fill, 0) * 100%);
+    background:var(--marquee);
+    z-index:1;
+  }
+  .gauge-value{font-family:'JetBrains Mono',monospace;font-size:0.85rem;color:var(--marquee);}
+
+  .empty{color:var(--muted);font-size:0.95rem;}
+
+  footer{
+    text-align:center;
+    padding:2rem 1rem;
+    font-size:0.8rem;
+    color:var(--muted);
+    background:var(--backstage-2);
+  }
+
+
+  @media (max-width:560px){
+    .ticket-form{flex-direction:column;align-items:center;}
+    .ticket-form input{width:100%;max-width:220px;}
+    .ticket-form button{align-self:center;width:100%;max-width:220px;}
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important;animation:none !important;}
+  }
+  </style>
+</head>
+<body>
+
+  <div class="marquee">
+    <div class="brand-row">
+      <span class="brand">CINESCOPE</span>
+      <span class="brand-tag">Sessão personalizada</span>
+    </div>
+    <div class="hero">
+      <h1>Quais as recomendações para você?</h1>
+      <p class="subtitle">Digite o número do seu bilhete e a rede neural escolhe a próxima sessão com base no que você já assistiu.</p>
+      <form class="ticket-form" id="ticket-form">
+        <div class="field">
+          <label for="user-id">Número do bilhete</label>
+          <input type="number" id="user-id" min="1" max="943" placeholder="ex.: 42" inputmode="numeric" required autofocus>
+        </div>
+        <button type="submit">Entrar na sessão</button>
+      </form>
+      <p class="hint">Use qualquer ID de 1 a 943 — são os espectadores do dataset MovieLens 100k.</p>
+    </div>
+  </div>
+
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+
+  <main id="results" hidden>
+    <section>
+      <div class="section-inner">
+        <span class="eyebrow">Sessões anteriores</span>
+        <h2>Seu histórico de favoritos</h2>
+        <div class="stub-row" id="favoritos-list"></div>
+      </div>
+    </section>
+    <section>
+      <div class="section-inner">
+        <span class="eyebrow">Em cartaz pra você</span>
+        <h2>Recomendado pela rede neural</h2>
+        <div class="stub-row" id="recomendacoes-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer>Cinescope · recomendações geradas por um modelo de embeddings treinado no MovieLens 100k</footer>
+
+<script>
+(function(){
+  const form = document.getElementById('ticket-form');
+  const input = document.getElementById('user-id');
+  const statusEl = document.getElementById('status');
+  const results = document.getElementById('results');
+  const favoritosList = document.getElementById('favoritos-list');
+  const recomendacoesList = document.getElementById('recomendacoes-list');
+
+  function setStatus(msg, kind){
+    statusEl.textContent = msg || '';
+    statusEl.className = 'status' + (kind ? ' status--' + kind : '');
+  }
+
+  function escapeHtml(str){
+    const div = document.createElement('div');
+    div.textContent = str == null ? '' : String(str);
+    return div.innerHTML;
+  }
+
+  function starString(nota){
+    const full = Math.max(0, Math.min(5, Math.round(Number(nota) || 0)));
+    return '★'.repeat(full) + '☆'.repeat(5 - full);
+  }
+
+  function gaugeSegments(valor){
+    const v = Math.max(0, Math.min(5, Number(valor) || 0));
+    let html = '';
+    for (let i = 1; i <= 5; i++){
+      const fill = Math.max(0, Math.min(1, v - (i - 1)));
+      html += '<span class="frame" style="--fill:' + fill + '"></span>';
+    }
+    return html;
+  }
+
+  function renderFavoritos(lista){
+
+  favoritosList.innerHTML = '';
+
+  if (!lista || lista.length === 0){
+    favoritosList.innerHTML =
+      '<p class="empty">Nenhum filme avaliado encontrado.</p>';
+    return;
+  }
+
+  lista.forEach(function(filme){
+
+    const stub = document.createElement('article');
+    stub.className = 'stub';
+
+    stub.innerHTML =
+      '<span class="stub-eyebrow">Bilhete avaliado</span>' +
+      '<h3>' + escapeHtml(filme.titulo) + '</h3>' +
+      '<span class="stars">' +
+      starString(filme.nota) +
+      '</span>' +
+      '<p class="gauge-value mono" style="margin-top:10px;">' +
+      filme.nota.toFixed(1) + ' / 5' +
+      '</p>';
+
+    favoritosList.appendChild(stub);
+
+  });
+
+}
+
+  function renderRecomendacoes(lista){
+
+  recomendacoesList.innerHTML = '';
+
+  if (!lista || lista.length === 0){
+    recomendacoesList.innerHTML =
+      '<p class="empty">Não foi possível gerar recomendações.</p>';
+    return;
+  }
+
+  lista.forEach(function(filme){
+
+    const stub = document.createElement('article');
+
+    stub.className = 'stub recommendation-ticket';
+
+    stub.innerHTML =
+      '<span class="stub-eyebrow">Recomendado</span>' +
+      '<h3>' + escapeHtml(filme.titulo) + '</h3>' +
+      '<span class="stars">' +
+      '★'.repeat(Math.round(filme.nota_prevista)) +
+      '</span>' +
+      '<br><br>' +
+      '<strong>' +
+      filme.nota_prevista.toFixed(1) +
+      ' / 5' +
+      '</strong>';
+
+    recomendacoesList.appendChild(stub);
+
+  });
+
+}
+
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    const id = Number(input.value);
+
+    if (!id || id < 1 || id > 943){
+      setStatus('Use um número de bilhete entre 1 e 943.', 'error');
+      results.hidden = true;
+      return;
+    }
+
+    results.hidden = true;
+    setStatus('Revelando a próxima sessão…', 'loading');
+
+    fetch('/recomendar/' + id)
+      .then(function(res){
+        if (!res.ok) throw new Error('status ' + res.status);
+        return res.json();
+      })
+      .then(function(data){
+        renderFavoritos(data.filmes_favoritos);
+        renderRecomendacoes(data.recomendacoes);
+        results.hidden = false;
+        setStatus('');
+      })
+      .catch(function(){
+        setStatus('Não conseguimos abrir essa sessão. Verifique o ID e tente de novo.', 'error');
+      });
+  });
+  
+  window.addEventListener('load', function () {
+    input.focus();
+});
+})();
+</script>
+</body>
+</html>

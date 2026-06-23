@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 
 import pandas as pd
 import numpy as np
@@ -6,6 +6,10 @@ import numpy as np
 from tensorflow.keras.models import load_model
 
 app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return render_template("index.html")
 
 # ==========================
 # Carregar modelo
@@ -108,10 +112,10 @@ def recomendar(usuario):
         resultado.append({
             "titulo": filme["titulo"],
             "nota_prevista": round(
-                float(filme["nota_prevista"]),
+                min(5.0, float(filme["nota_prevista"])),
                 2
-            )
-        })
+        )
+    })
 
     # ==========================
     # Resposta JSON
